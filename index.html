@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>任务价值四象限分析工具</title>
+  <!-- 引入Element Plus样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <el-container>
+      <el-header>
+        <h1>任务价值四象限分析工具</h1>
+      </el-header>
+      <el-main>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-card class="box-card">
+              <template #header>
+                <div class="card-header">
+                  <span>添加新任务</span>
+                </div>
+              </template>
+              <el-form :model="taskForm" label-width="120px">
+                <el-form-item label="任务名称">
+                  <el-input v-model="taskForm.name" placeholder="请输入任务名称"></el-input>
+                </el-form-item>
+                <el-form-item label="任务描述">
+                  <el-input v-model="taskForm.description" type="textarea" placeholder="请输入任务描述"></el-input>
+                </el-form-item>
+                <el-form-item label="战略价值 (0-10)">
+                  <el-slider v-model="taskForm.strategicValue" :min="0" :max="10" :step="1" show-stops></el-slider>
+                </el-form-item>
+                <el-form-item label="实施成本 (0-10)">
+                  <el-slider v-model="taskForm.implementationCost" :min="0" :max="10" :step="1" show-stops></el-slider>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="addTask">添加任务</el-button>
+                  <el-button @click="resetForm">重置</el-button>
+                </el-form-item>
+              </el-form>
+            </el-card>
+          </el-col>
+          <el-col :span="12">
+            <el-card class="box-card">
+              <template #header>
+                <div class="card-header">
+                  <span>任务价值四象限</span>
+                </div>
+              </template>
+              <div class="chart-container" ref="chartContainer">
+                <!-- 四象限图表将在这里渲染 -->
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+        
+        <el-row style="margin-top: 20px;">
+          <el-col :span="24">
+            <el-card class="box-card">
+              <template #header>
+                <div class="card-header">
+                  <span>任务列表</span>
+                  <el-radio-group v-model="currentQuadrant" size="small">
+                    <el-radio-button label="all">全部</el-radio-button>
+                    <el-radio-button label="q1">第一象限</el-radio-button>
+                    <el-radio-button label="q2">第二象限</el-radio-button>
+                    <el-radio-button label="q3">第三象限</el-radio-button>
+                    <el-radio-button label="q4">第四象限</el-radio-button>
+                  </el-radio-group>
+                </div>
+              </template>
+              <el-table :data="filteredTasks" style="width: 100%">
+                <el-table-column prop="name" label="任务名称" width="180"></el-table-column>
+                <el-table-column prop="description" label="任务描述"></el-table-column>
+                <el-table-column prop="strategicValue" label="战略价值" width="100"></el-table-column>
+                <el-table-column prop="implementationCost" label="实施成本" width="100"></el-table-column>
+                <el-table-column prop="quadrant" label="象限" width="100">
+                  <template #default="scope">
+                    <el-tag :type="getQuadrantTagType(scope.row.quadrant)">{{ getQuadrantName(scope.row.quadrant) }}</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" width="120">
+                  <template #default="scope">
+                    <el-button size="small" type="danger" @click="removeTask(scope.$index)">删除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-card>
+          </el-col>
+        </el-row>
+        
+        <el-row style="margin-top: 20px;">
+          <el-col :span="24">
+            <el-card class="box-card">
+              <template #header>
+                <div class="card-header">
+                  <span>象限说明</span>
+                </div>
+              </template>
+              <div class="quadrant-description">
+                <div class="quadrant-item">
+                  <h3><el-tag type="danger">第一象限 (高价值/低成本)</el-tag></h3>
+                  <p>这些任务具有高战略价值且实施成本低，应该优先处理。</p>
+                </div>
+                <div class="quadrant-item">
+                  <h3><el-tag type="warning">第二象限 (高价值/高成本)</el-tag></h3>
+                  <p>这些任务具有高战略价值但实施成本也高，需要仔细规划和资源分配。</p>
+                </div>
+                <div class="quadrant-item">
+                  <h3><el-tag type="info">第三象限 (低价值/低成本)</el-tag></h3>
+                  <p>这些任务战略价值低但实施成本也低，可以在资源允许的情况下处理。</p>
+                </div>
+                <div class="quadrant-item">
+                  <h3><el-tag type="info">第四象限 (低价值/高成本)</el-tag></h3>
+                  <p>这些任务战略价值低且实施成本高，应该避免或推迟处理。</p>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </el-main>
+      <el-footer>
+        <p>任务价值四象限分析工具 © 2025</p>
+      </el-footer>
+    </el-container>
+  </div>
+
+  <!-- 引入Vue.js -->
+  <script src="https://unpkg.com/vue@3"></script>
+  <!-- 引入Element Plus -->
+  <script src="https://unpkg.com/element-plus"></script>
+  <!-- 引入Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- 引入自定义脚本 -->
+  <script src="js/app.js"></script>
+</body>
+</html>
