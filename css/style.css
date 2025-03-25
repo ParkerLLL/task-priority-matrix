@@ -1,0 +1,75 @@
+/* 全局样式 */
+body {
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f7fa;
+}
+
+/* 头部样式 */
+.el-header {
+  background-color: #409EFF;
+  color: white;
+  text-align: center;
+  line-height: 60px;
+  padding: 0;
+}
+
+.el-header h1 {
+  margin: 0;
+}
+
+/* 主体内容样式 */
+.el-main {
+  padding: 20px;
+}
+
+/* 卡片样式 */
+.box-card {
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 图表容器样式 */
+.chart-container {
+  height: 400px;
+  position: relative;
+}
+
+/* 象限说明样式 */
+.quadrant-description {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.quadrant-item {
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.quadrant-item h3 {
+  margin-top: 0;
+}
+
+/* 页脚样式 */
+.el-footer {
+  background-color: #545c64;
+  color: #fff;
+  text-align: center;
+  line-height: 60px;
+  padding: 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .quadrant-description {
+    grid-template-columns: 1fr;
+  }
+}
